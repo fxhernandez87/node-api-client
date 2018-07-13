@@ -10,6 +10,16 @@ const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 const readDir = promisify(fs.readdir);
 const deleteFile = promisify(fs.unlink);
+const getStatus = promisify(fs.stat);
+const makeDir = promisify(fs.mkdir);
+
+// initialize data directory
+const initialize = (baseDir, entity) => {
+  return getStatus(`${baseDir}`)
+    .catch(() => makeDir(`${baseDir}`, 755))
+    .then(() => getStatus(`${baseDir}/${entity}`))
+    .catch(() => makeDir(`${baseDir}/${entity}`, 755))
+};
 
 // create the service wrapper to manipulate different entities
 const dataService = entity => {
@@ -25,6 +35,8 @@ const dataService = entity => {
 
     return func(fileName, ...data);
   };
+
+  initialize(baseDir, entity);
 
   /**
    * Possible Errors: [EEXIST, EACCES, EISDIR]
