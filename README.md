@@ -2,7 +2,7 @@
 
 ## Paths
 
-* [Users](#Users)
+* [Users](#users)
 * [Tokens](#tokens)
 * [Items](#items)
 * [Cart](#cart)
