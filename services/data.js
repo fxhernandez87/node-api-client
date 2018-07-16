@@ -19,6 +19,7 @@ const initialize = (baseDir, entity) => {
     .catch(() => makeDir(`${baseDir}`, 755))
     .then(() => getStatus(`${baseDir}/${entity}`))
     .catch(() => makeDir(`${baseDir}/${entity}`, 755))
+    .catch(() => {});
 };
 
 // create the service wrapper to manipulate different entities

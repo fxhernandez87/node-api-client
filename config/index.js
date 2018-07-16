@@ -11,7 +11,14 @@ if (process.env.NODE_ENV === 'production') {
   config.stripe = {
     publishable: 'pk_test_vwDivBwPeLHL3jtOd8D6rPCu',
     secret: 'sk_test_ZC817xZyVcVXjNIOjnfjrzLC'
-  }
+  };
+  config.mailgun = {
+    apiHostName: 'api.mailgun.net',
+    apiProtocol: 'https:',
+    apiPath: '/v3/sandboxf4057411f5d24c86a990185d1d964e90.mailgun.org/messages',
+    apiKey: 'key-fed165a146b68f88d307560f11d8bfd2',
+    defaultPassword: '9c9769e5ae01f99561991e252e99d1d5-21e977f8-a0cef03b'
+  };
 }
 
 module.exports = config;
