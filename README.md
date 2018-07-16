@@ -10,12 +10,12 @@
 
 ### Users
 #### Methods
-- **[<code>GET</code> ](#userget)** /users
+- **[<code>GET</code> ](#user/GET)** /users
 - **[<code>POST</code> ](#post)** /users
 - **[<code>UPDATE</code> ](#update)** /users
 - **[<code>DELETE</code> ](#delete)** /users
 
-#### User Get      
+#### User/GET      
 ##### Path:
     /users
 ##### Parameters:
