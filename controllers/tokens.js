@@ -76,12 +76,10 @@ const getToken = async ({ queryStringObject }) => {
 const updateToken = async ({ payload, queryStringObject }) => {
   const id = (typeof queryStringObject.id === 'string' && typeof payload.id === 'undefined' && queryStringObject.id.length === 16) ? queryStringObject.id : false;
   const expires = (typeof payload.expires === 'number' && payload.expires.length > 0) ? payload.expires : false;
-  const userEmail = (typeof payload.userEmail === 'string' && payload.userEmail.length > 0 && mailRegex.test(payload.userEmail.email)) ? payload.userEmail : false;
-  if (id && (expires || userEmail)) {
+  if (id && expires) {
     try {
       const tokenData = await tokenService.read(id);
       tokenData.expires = expires || tokenData.expires;
-      tokenData.userEmail = userEmail || tokenData.userEmail;
 
       await tokenService.update(id, tokenData);
 
