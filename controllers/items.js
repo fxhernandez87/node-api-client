@@ -4,6 +4,7 @@ const dataService = require('../services/data');
 
 // instantiating service
 const itemService = dataService('items');
+const userService = dataService('users');
 
 /**
  * Required Fields: email and password
@@ -128,7 +129,22 @@ const deleteItem = async ({ queryStringObject }) => {
   const id = (typeof queryStringObject.id === 'string' && queryStringObject.id.length === 16) ? queryStringObject.id : false;
   if (id) {
     try {
+      // remove item
       await itemService.remove(id);
+
+      // find all users that have that item on their cart
+      const userList = await userService.list();
+      console.log('1', userList);
+      const userDataList = await Promise.all(userList.map(email => userService.read(email)));
+      console.log('2', userDataList);
+
+      //filter all users that have that item
+      const userWithThisItem = userDataList.filter(user => user.cartItems.find(itemId => itemId === id));
+      console.log('3', userWithThisItem);
+      await Promise.all(userWithThisItem.map(user => {
+        const cartItems = user.cartItems.filter(item => item !== id);
+        return userService.update(user.email, {...user, cartItems})
+      }));
 
       return formatResponse(200, 'item removed correctly', {});
     } catch (err) {
