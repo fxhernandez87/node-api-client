@@ -311,7 +311,7 @@
     404: Item not found    
     500: Insufficient Permissions
     
-### Carts
+### Cart
 #### Methods
 - **[<code>GET</code> ](#cartget)** /cart
 - **[<code>POST</code> ](#cartpost)** /cart
