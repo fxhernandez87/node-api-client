@@ -29,6 +29,7 @@ const server = http.createServer((req, res) => {
     buffer += decoder.end();
 
     const isValidRequest = router.isValidRequest(path, method);
+    console.log(path);
 
     const controller = isValidRequest ? router[path] : false;
 
@@ -38,15 +39,24 @@ const server = http.createServer((req, res) => {
       queryStringObject,
       payload: buffer ? JSON.parse(buffer) : {}
     };
-
-    const response = controller ? await controller[method](data) : {
+    console.log(controller);
+    const {contentType, ...response} = controller ? await controller[method](data) : {
       statusCode: router.isValidPath(path) ? 405 : 400,
         message: router.isValidPath(path) ? 'Method not allowed' : 'Invalid Path',
     };
-    res.setHeader('Content-Type', 'application/json');
+    console.log(contentType);
+
+    let payloadString = '';
+    res.setHeader('Content-Type', contentType || 'application/json');
     res.writeHead(response.statusCode);
     console.log(method.toUpperCase(), path, response.statusCode, `${process.hrtime(start)[1] / 100000} ms`);
-    res.end(JSON.stringify(response));
+    if (contentType === 'application/json') {
+      payloadString = typeof(response) === 'object'? JSON.stringify(response) : '';
+    } else {
+      payloadString = response.data;
+    }
+    console.log(contentType);
+    res.end(payloadString);
   })
 });
 

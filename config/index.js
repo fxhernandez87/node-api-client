@@ -19,6 +19,12 @@ if (process.env.NODE_ENV === 'production') {
     apiKey: 'key-fed165a146b68f88d307560f11d8bfd2',
     defaultPassword: '9c9769e5ae01f99561991e252e99d1d5-21e977f8-a0cef03b'
   };
+  config.templateGlobals = {
+    appName : 'Delivery APP',
+    companyName : 'NotARealCompany, Inc.',
+    yearCreated : '2018',
+    baseUrl : 'http://localhost:3000/'
+  }
 }
 
 module.exports = config;
