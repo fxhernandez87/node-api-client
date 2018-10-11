@@ -29,22 +29,20 @@ const server = http.createServer((req, res) => {
     buffer += decoder.end();
 
     const isValidRequest = router.isValidRequest(path, method);
-    console.log(path);
+    const isPublic = router.isPublicRequest(path, method);
 
-    const controller = isValidRequest ? router[path] : false;
-
+    const controller = isValidRequest ? isPublic ? router['public/*'] : router[path] : false;
     const data = {
       headers,
       method,
       queryStringObject,
+      path,
       payload: buffer ? JSON.parse(buffer) : {}
     };
-    console.log(controller);
     const {contentType, ...response} = controller ? await controller[method](data) : {
       statusCode: router.isValidPath(path) ? 405 : 400,
         message: router.isValidPath(path) ? 'Method not allowed' : 'Invalid Path',
     };
-    console.log(contentType);
 
     let payloadString = '';
     res.setHeader('Content-Type', contentType || 'application/json');
@@ -55,7 +53,6 @@ const server = http.createServer((req, res) => {
     } else {
       payloadString = response.data;
     }
-    console.log(contentType);
     res.end(payloadString);
   })
 });

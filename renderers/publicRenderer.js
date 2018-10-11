@@ -3,22 +3,29 @@ const { formatResponse, getStaticAsset} = require('../lib/helpers');
 
 
 const getPublic = async (payload) => {
-  console.log(payload);
-  // Prepare data for interpolation
-  // const templateData = {
-  //   'head.title' : 'Delivery Application',
-  //   'head.description' : 'Orders and payments made easy',
-  //   'body.class' : 'index'
-  // };
   try {
-    // Read in a template as a string
-    // Read in a template as a string
-    const favicon = await getStaticAsset('favicon.ico');
+    // Get the filename being requested
+    const trimmedAssetName = payload.path.replace('public/','').trim();
+    // Getting the static asset
+    const asset = await getStaticAsset(trimmedAssetName);
 
-    return formatResponse(200, '', favicon, 'image/x-icon');
-
+    // get the content type
+    switch (true) {
+      case trimmedAssetName.indexOf('.css') > -1:
+        return formatResponse(200, '', asset, 'text/css');
+      case trimmedAssetName.indexOf('.png') > -1:
+        return formatResponse(200, '', asset, 'image/png');
+      case trimmedAssetName.indexOf('.jpg') > -1:
+        return formatResponse(200, '', asset, 'image/jpeg');
+      case trimmedAssetName.indexOf('.ico') > -1:
+        return formatResponse(200, '', asset, 'image/x-icon');
+      case trimmedAssetName.indexOf('.html') > -1:
+        return formatResponse(200, '', asset, 'text/html');
+      default:
+        return formatResponse(200, '', asset, 'text/plain');
+    }
   } catch (err) {
-    return formatResponse(500, '', 'error', 'text/html');
+    return formatResponse(500, err.message, 'error', 'text/html');
   }
 };
 

@@ -81,6 +81,7 @@ body.loggedIn .header ul li.loggedOut{
     margin-top: 150px;
     width: 1000px;
     margin: 150px auto;
+    min-height: calc(100% - 411px);
 }
 
 .footer{

@@ -13,6 +13,8 @@ const mailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))
  * Required Fields: email and password
  */
 const postToken = async ({ payload }) => {
+  console.log(payload);
+
   const requestEmail = (typeof payload.email === 'string' && payload.email.length > 0) ? payload.email : false;
   const requestPassword = (typeof payload.password === 'string' && payload.password.length > 0) ? hashString(payload.password) : false;
   if (requestEmail && requestPassword) {
@@ -136,4 +138,5 @@ module.exports = {
   get: getToken,
   put: updateToken,
   delete: deleteToken,
+  options: () => formatResponse(200, 'request valid'),
 };
