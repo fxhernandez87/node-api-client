@@ -361,8 +361,8 @@ app.loadDataOnPage = function(){
   }
 
   // Logic for dashboard page
-  if(primaryClass == 'items-list'){
-    app.loadChecksListPage();
+  if(primaryClass == 'items-available'){
+    app.loadItemsAvailablePage();
   }
 
   // Logic for check details page
@@ -404,7 +404,7 @@ app.loadAccountEditPage = function(){
 };
 
 // Load the dashboard page specifically
-app.loadChecksListPage = function(){
+app.loadItemsAvailablePage = function(){
   // Get the email number from the current token, or log the user out if none is there
   var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
   if(email){
