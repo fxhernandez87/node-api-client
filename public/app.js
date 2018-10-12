@@ -51,7 +51,7 @@ app.client.request = function(headers,path,method,queryStringObject,payload,call
     }
   }
 
-  // If there is a current session token set, add that as a header
+  // If there is a current session appToken set, add that as a header
   if(app.config.sessionToken){
     xhr.setRequestHeader("tokenid", app.config.sessionToken.id);
   }
@@ -99,15 +99,15 @@ app.logUserOut = function(redirectUser){
   // Set redirectUser to default to true
   redirectUser = typeof(redirectUser) == 'boolean' ? redirectUser : true;
 
-  // Get the current token id
-  var tokenId = typeof(app.config.sessionToken.id) == 'string' ? app.config.sessionToken.id : false;
+  // Get the current appToken id
+  var appTokenId = typeof(app.config.sessionToken.id) == 'string' ? app.config.sessionToken.id : false;
 
-  // Send the current token to the tokens endpoint to delete it
+  // Send the current appToken to the appTokens endpoint to delete it
   var queryStringObject = {
-    'id' : tokenId
+    'id' : appTokenId
   };
   app.client.request(undefined,'api/tokens','DELETE',queryStringObject,undefined,function(statusCode,responsePayload){
-    // Set the app.config token as false
+    // Set the app.config appToken as false
     app.setSessionToken(false);
 
     // Send the user to the logged out page
@@ -237,13 +237,13 @@ app.formResponseProcessor = function(formId,requestPayload,responsePayload){
         document.querySelector("#"+formId+" .formError").style.display = 'block';
 
       } else {
-        // If successful, set the token and redirect the user
+        // If successful, set the appToken and redirect the user
         app.setSessionToken(newResponsePayload.data);
         window.location = '/items/available';
       }
     });
   }
-  // If login was successful, set the token in localstorage and redirect the user
+  // If login was successful, set the appToken in localstorage and redirect the user
   if(formId == 'sessionCreate'){
     app.setSessionToken(responsePayload.data);
     window.location = '/items/available';
@@ -273,12 +273,12 @@ app.formResponseProcessor = function(formId,requestPayload,responsePayload){
 
 };
 
-// Get the session token from localstorage and set it in the app.config object
+// Get the session appToken from localstorage and set it in the app.config object
 app.getSessionToken = function(){
-  var tokenString = localStorage.getItem('token');
-  if(typeof(tokenString) == 'string'){
+  var appTokenString = localStorage.getItem('appToken');
+  if(typeof(appTokenString) == 'string'){
     try{
-      var token = JSON.parse(tokenString);
+      var token = JSON.parse(appTokenString);
       app.config.sessionToken = token;
       if(typeof(token) == 'object'){
         app.setLoggedInClass(true);
@@ -302,23 +302,27 @@ app.setLoggedInClass = function(add){
   }
 };
 
-// Set the session token in the app.config object as well as localstorage
-app.setSessionToken = function(token){
-  app.config.sessionToken = token;
-  var tokenString = JSON.stringify(token);
-  localStorage.setItem('token',tokenString);
-  if(typeof(token) == 'object'){
-    app.setLoggedInClass(true);
-  } else {
-    app.setLoggedInClass(false);
+// Set the session appToken in the app.config object as well as localstorage
+app.setSessionToken = function(appToken){
+  try {
+    var appTokenString = JSON.stringify(appToken);
+    localStorage.setItem('appToken', appTokenString);
+    app.config.sessionToken = appToken;
+    if (typeof(appToken) == 'object') {
+      app.setLoggedInClass(true);
+    } else {
+      app.setLoggedInClass(false);
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
 
-// Renew the token
+// Renew the appToken
 app.renewToken = function(callback){
   var currentToken = typeof(app.config.sessionToken) == 'object' ? app.config.sessionToken : false;
   if(currentToken){
-    // Update the token with a new expiration
+    // Update the appToken with a new expiration
     var payload = {
       'expires' : Date.now() + 1000 * 60 * 60 * 24
     };
@@ -326,18 +330,9 @@ app.renewToken = function(callback){
     app.client.request(undefined,'api/tokens','PUT',queryStringObject,payload,function(statusCode,responsePayload){
       // Display an error on the form if needed
       if(statusCode == 200){
-        // Get the new token details
-
-        app.client.request(undefined,'api/tokens','GET',queryStringObject,undefined,function(statusCode,responsePayload){
-          // Display an error on the form if needed
-          if(statusCode == 200){
-            app.setSessionToken(responsePayload.data);
-            callback(false);
-          } else {
-            app.setSessionToken(false);
-            callback(true);
-          }
-        });
+        // Get the new appToken details
+        app.setSessionToken(responsePayload.data);
+        callback(false);
       } else {
         app.setSessionToken(false);
         callback(true);
@@ -373,7 +368,7 @@ app.loadDataOnPage = function(){
 
 // Load the account edit page specifically
 app.loadAccountEditPage = function(){
-  // Get the email number from the current token, or log the user out if none is there
+  // Get the email number from the current appToken, or log the user out if none is there
   var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
   if(email){
     // Fetch the user data
@@ -394,18 +389,19 @@ app.loadAccountEditPage = function(){
         }
 
       } else {
-        // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
+        // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users appToken is bad)
         app.logUserOut();
       }
     });
   } else {
+    console.log('loggingUser OUT 4');
     app.logUserOut();
   }
 };
 
 // Load the dashboard page specifically
 app.loadItemsAvailablePage = function(){
-  // Get the email number from the current token, or log the user out if none is there
+  // Get the email number from the current appToken, or log the user out if none is there
   var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
   if(email){
     // Fetch the user data
@@ -456,14 +452,14 @@ app.loadItemsAvailablePage = function(){
 
         } else {
           // Show 'you have no checks' message
-          document.getElementById("noChecksMessage").style.display = 'table-row';
+          // document.getElementById("noChecksMessage").style.display = 'table-row';
 
           // Show the createCheck CTA
-          document.getElementById("createCheckCTA").style.display = 'block';
+          // document.getElementById("createCheckCTA").style.display = 'block';
 
         }
       } else {
-        // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
+        // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users appToken is bad)
         app.logUserOut();
       }
     });
@@ -514,8 +510,8 @@ app.loadChecksEditPage = function(){
   }
 };
 
-// Loop to renew token often
-app.tokenRenewalLoop = function(){
+// Loop to renew appToken often
+app.appTokenRenewalLoop = function(){
   setInterval(function(){
     app.renewToken(function(err){
       if(!err){
@@ -534,11 +530,11 @@ app.init = function(){
   // Bind logout logout button
   app.bindLogoutButton();
 
-  // Get the token from localstorage
+  // Get the appToken from localstorage
   app.getSessionToken();
 
-  // Renew token
-  app.tokenRenewalLoop();
+  // Renew appToken
+  app.appTokenRenewalLoop();
 
   // Load data on page
   app.loadDataOnPage();

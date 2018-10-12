@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === 'production') {
   config.httpsPort = 5001;
   config.hashSecret = 'fxh';
 } else {
-  config.httpPort = 3000;
+  config.httpPort = 3002;
   config.httpsPort = 3001;
   config.hashSecret = 'fxh';
   config.stripe = {
@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'production') {
     appName : 'Delivery APP',
     companyName : 'NotARealCompany, Inc.',
     yearCreated : '2018',
-    baseUrl : 'http://localhost:3000/'
+    baseUrl : 'http://localhost:3002/'
   }
 }
 
