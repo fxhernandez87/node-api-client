@@ -10,7 +10,6 @@ const userService = dataService('users');
  * Required Fields: email and password
  */
 const postItem = async ({ payload }) => {
-  console.log(typeof payload.price);
   const name = (typeof payload.name === 'string' && payload.name.length > 0) ? payload.name : false;
   const price = (typeof payload.price === 'number' && payload.price > 0) ? payload.price : false;
   if (name && price) {
@@ -134,13 +133,10 @@ const deleteItem = async ({ queryStringObject }) => {
 
       // find all users that have that item on their cart
       const userList = await userService.list();
-      console.log('1', userList);
       const userDataList = await Promise.all(userList.map(email => userService.read(email)));
-      console.log('2', userDataList);
 
       //filter all users that have that item
       const userWithThisItem = userDataList.filter(user => user.cartItems.find(itemId => itemId === id));
-      console.log('3', userWithThisItem);
       await Promise.all(userWithThisItem.map(user => {
         const cartItems = user.cartItems.filter(item => item !== id);
         return userService.update(user.email, {...user, cartItems})

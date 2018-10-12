@@ -5,7 +5,6 @@
 
 // Container for frontend application
 var app = {};
-
 // Config
 app.config = {
   'sessionToken' : false
@@ -54,7 +53,7 @@ app.client.request = function(headers,path,method,queryStringObject,payload,call
 
   // If there is a current session token set, add that as a header
   if(app.config.sessionToken){
-    xhr.setRequestHeader("token", app.config.sessionToken.id);
+    xhr.setRequestHeader("tokenid", app.config.sessionToken.id);
   }
 
   // When the request comes back, handle the response
@@ -74,7 +73,7 @@ app.client.request = function(headers,path,method,queryStringObject,payload,call
 
       }
     }
-  }
+  };
 
   // Send the payload as JSON
   var payloadString = JSON.stringify(payload);
@@ -178,9 +177,12 @@ app.bindForms = function(){
           }
         }
 
-
         // If the method is DELETE, the payload should be a queryStringObject instead
         var queryStringObject = method == 'DELETE' ? payload : {};
+        if (['accountEdit1', 'accountEdit2', 'accountEdit3'].includes(formId)){
+          queryStringObject = {email: payload.email};
+          delete payload.email;
+        }
 
         // Call the API
         app.client.request(undefined,path,method,queryStringObject,payload,function(statusCode,responsePayload){
@@ -194,7 +196,7 @@ app.bindForms = function(){
             } else {
 
               // Try to get the error from the api, or set a default error message
-              var error = typeof(responsePayload.Error) == 'string' ? responsePayload.Error : 'An error has occured, please try again';
+              var error = typeof(responsePayload.message) == 'string' ? responsePayload.message : 'An error has occured, please try again';
 
               // Set the formError field with the error text
               document.querySelector("#"+formId+" .formError").innerHTML = error;
@@ -236,14 +238,13 @@ app.formResponseProcessor = function(formId,requestPayload,responsePayload){
 
       } else {
         // If successful, set the token and redirect the user
-        app.setSessionToken(newResponsePayload);
+        app.setSessionToken(newResponsePayload.data);
         window.location = '/items/available';
       }
     });
   }
   // If login was successful, set the token in localstorage and redirect the user
   if(formId == 'sessionCreate'){
-    console.log(responsePayload);
     app.setSessionToken(responsePayload.data);
     window.location = '/items/available';
   }
@@ -319,18 +320,18 @@ app.renewToken = function(callback){
   if(currentToken){
     // Update the token with a new expiration
     var payload = {
-      'id' : currentToken.id,
-      'extend' : true,
+      'expires' : Date.now() + 1000 * 60 * 60 * 24
     };
-    app.client.request(undefined,'api/tokens','PUT',undefined,payload,function(statusCode,responsePayload){
+    var queryStringObject = {'id' : currentToken.id};
+    app.client.request(undefined,'api/tokens','PUT',queryStringObject,payload,function(statusCode,responsePayload){
       // Display an error on the form if needed
       if(statusCode == 200){
         // Get the new token details
-        var queryStringObject = {'id' : currentToken.id};
+
         app.client.request(undefined,'api/tokens','GET',queryStringObject,undefined,function(statusCode,responsePayload){
           // Display an error on the form if needed
           if(statusCode == 200){
-            app.setSessionToken(responsePayload);
+            app.setSessionToken(responsePayload.data);
             callback(false);
           } else {
             app.setSessionToken(false);
@@ -355,17 +356,17 @@ app.loadDataOnPage = function(){
   var primaryClass = typeof(bodyClasses[0]) == 'string' ? bodyClasses[0] : false;
 
   // Logic for account settings page
-  if(primaryClass == 'accountEdit'){
+  if(primaryClass == 'account-edit'){
     app.loadAccountEditPage();
   }
 
   // Logic for dashboard page
-  if(primaryClass == 'checksList'){
+  if(primaryClass == 'items-list'){
     app.loadChecksListPage();
   }
 
   // Logic for check details page
-  if(primaryClass == 'checksEdit'){
+  if(primaryClass == 'items-edit'){
     app.loadChecksEditPage();
   }
 };
@@ -373,7 +374,6 @@ app.loadDataOnPage = function(){
 // Load the account edit page specifically
 app.loadAccountEditPage = function(){
   // Get the email number from the current token, or log the user out if none is there
-  console.log(app);
   var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
   if(email){
     // Fetch the user data
@@ -381,17 +381,16 @@ app.loadAccountEditPage = function(){
       'email' : email
     };
     app.client.request(undefined,'api/users','GET',queryStringObject,undefined,function(statusCode,responsePayload){
-      console.log(responsePayload);
       if(statusCode == 200){
         // Put the data into the forms as values where needed
-        document.querySelector("#accountEdit1 .firstNameInput").value = responsePayload.firstName;
-        document.querySelector("#accountEdit1 .lastNameInput").value = responsePayload.lastName;
-        document.querySelector("#accountEdit1 .displayEmailInput").value = responsePayload.email;
+        document.querySelector("#accountEdit1 .nameInput").value = responsePayload.data.name || '';
+        document.querySelector("#accountEdit1 .addressInput").value = responsePayload.data.address || '';
+        document.querySelector("#accountEdit1 .displayEmailInput").value = responsePayload.data.email;
 
         // Put the hidden email field into both forms
         var hiddenEmailInputs = document.querySelectorAll("input.hiddenEmailInput");
         for(var i = 0; i < hiddenEmailInputs.length; i++){
-          hiddenEmailInputs[i].value = responsePayload.email;
+          hiddenEmailInputs[i].value = responsePayload.data.email;
         }
 
       } else {
@@ -523,7 +522,7 @@ app.tokenRenewalLoop = function(){
         console.log("Token renewed successfully @ "+Date.now());
       }
     });
-  },1000 * 60);
+  },1000 * 10);
 };
 
 // Init (bootstrapping)

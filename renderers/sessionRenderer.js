@@ -7,7 +7,7 @@ const getIndex = async (data) => {
   const templateData = {
     'head.title' : 'Delivery Application',
     'head.description' : 'Orders and payments made easy',
-    'body.class' : 'index'
+    'body.class' : data.path.replace('/', '-')
   };
   try {
     // Read in a template as a string

@@ -13,8 +13,6 @@ const mailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))
  * Required Fields: email and password
  */
 const postToken = async ({ payload }) => {
-  console.log(payload);
-
   const requestEmail = (typeof payload.email === 'string' && payload.email.length > 0) ? payload.email : false;
   const requestPassword = (typeof payload.password === 'string' && payload.password.length > 0) ? hashString(payload.password) : false;
   if (requestEmail && requestPassword) {
@@ -77,7 +75,7 @@ const getToken = async ({ queryStringObject }) => {
 
 const updateToken = async ({ payload, queryStringObject }) => {
   const id = (typeof queryStringObject.id === 'string' && typeof payload.id === 'undefined' && queryStringObject.id.length === 16) ? queryStringObject.id : false;
-  const expires = (typeof payload.expires === 'number' && payload.expires.length > 0) ? payload.expires : false;
+  const expires = (typeof payload.expires === 'number') ? payload.expires : false;
   const userEmail = (typeof payload.userEmail === 'string' && payload.userEmail.length > 0 && mailRegex.test(payload.userEmail.email)) ? payload.userEmail : false;
   if (id && (expires || userEmail)) {
     try {

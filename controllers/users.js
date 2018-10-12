@@ -15,7 +15,8 @@ const postUser = async ({ payload }) => {
   const address = (typeof payload.address === 'string' && payload.address.length > 0) ? payload.address : false;
   const password = (typeof payload.password === 'string' && payload.password.length > 0) ? hashString(payload.password) : false;
   const name = (typeof payload.name === 'string' && payload.name.length > 0) ? payload.name : false;
-  if (email && address && name && password) {
+  const tosAgreement = (typeof payload.tosAgreement === 'boolean') ? payload.tosAgreement : false;
+  if (email && address && name && password && tosAgreement) {
     try {
       const userData = {email, address, name, password};
 
@@ -35,6 +36,8 @@ const postUser = async ({ payload }) => {
           return formatResponse(400, err.message);
       }
     }
+  } else if (!tosAgreement) {
+    return formatResponse(400, 'You must agree term and conditions');
   } else {
     return formatResponse(400, 'Required fields missing or they were invalid');
   }

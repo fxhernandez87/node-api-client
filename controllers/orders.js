@@ -21,7 +21,6 @@ const makeRequest = async (options, postData)  => {
         response = chunk;
       });
       res.on('end', () => {
-        console.log(typeof response);
         try {
           resolve(JSON.parse(response));
         } catch (err) {
@@ -31,7 +30,6 @@ const makeRequest = async (options, postData)  => {
     });
 
     req.on('error', (e) => {
-      console.log(e);
       reject(formatResponse(400, `problem with request: ${e.message}`));
     });
 
