@@ -5,7 +5,9 @@ const { formatResponse, getStaticAsset} = require('../lib/helpers');
 const getPublic = async (payload) => {
   try {
     // Get the filename being requested
+
     const trimmedAssetName = payload.path.replace('public/','').trim();
+    console.log(trimmedAssetName);
     // Getting the static asset
     const asset = await getStaticAsset(trimmedAssetName);
 

@@ -411,6 +411,10 @@ app.loadItemsAvailablePage = function(){
     app.client.request(undefined,'api/users','GET',queryStringObject,undefined,function(statusCode,responsePayload){
       if(statusCode == 200){
 
+        app.client.request(undefined,'api/items','GET',undefined,undefined,function(statusCode,itemsPayload){
+          console.log(itemsPayload);
+        });
+
         // Determine how many checks the user has
         var allChecks = typeof(responsePayload.checks) == 'object' && responsePayload.checks instanceof Array && responsePayload.checks.length > 0 ? responsePayload.checks : [];
         if(allChecks.length > 0){
