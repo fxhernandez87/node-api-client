@@ -399,8 +399,26 @@ app.loadAccountEditPage = function(){
   }
 };
 
+// bind items to order
+app.bindItemClicks = function() {
+  const allItems = document.getElementsByClassName("card");
+  for (let i = 0; i < allItems.length; i++) {
+    const itemId = allItems[i].id;
+    let bought = parseInt(allItems[i].getAttribute('data-bought'));
+    document.getElementById(itemId).addEventListener('click', function() {
+      app.client.request(undefined,'api/items','PUT',{id: itemId},{bought: bought + 1},function(statusCode,responsePayload) {
+        bought = responsePayload.data.bought;
+        allItems[i].setAttribute("data-bought", responsePayload.data.bought);
+        allItems[i].getElementsByClassName("item-bought")[0].innerText = "Ordered " + responsePayload.data.bought;
+      });
+    })
+
+  }
+};
+
 // Load the dashboard page specifically
 app.loadItemsAvailablePage = function(){
+  app.bindItemClicks();
   // Get the email number from the current appToken, or log the user out if none is there
   var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
   if(email){

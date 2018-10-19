@@ -25,23 +25,22 @@ const getIndex = async (data) => {
 
       const itemsRender = await Promise.all(
         itemsData.map(async ({id, name, description, price, image, bought}) => {
+          console.log(bought);
           const itemRender = {
             'item.id': id,
             'item.name': name,
             'item.description': description || '',
             'item.price': price,
             'item.image': image || 'public/images/empty.jpg',
-            'item.bought': bought || 0
+            'item.bought': parseInt(bought) || 0
           };
+          console.log(itemRender);
           // Read in item template as a string
           return getTemplate('item', itemRender);
         })
       );
       templateData['body.items'] = itemsRender.join('');
     }
-
-    console.log(templateData);
-
     // Read in a template as a string
     const str = await getTemplate(data.path.replace('/', '-'), templateData);
     // Add the universal header and footer

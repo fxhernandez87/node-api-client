@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card" id="{item.id}" data-bought="{item.bought}">
   <div class="image">
     <img src="{item.image}">
   </div>
@@ -10,12 +10,12 @@
     </div>
   </div>
   <div class="extra card-content">
-  <span class="right floated">
-    {item.price}
-  </span>
-    <span>
-    <i class="user icon"></i>
-    {item.bought}
-  </span>
+    <span class="right floated">
+      ${item.price}
+    </span>
+    <span class="item-bought">
+      <!--<i class="user icon"></i>-->
+      Ordered {item.bought}
+    </span>
   </div>
 </div>

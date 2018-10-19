@@ -7,7 +7,6 @@ const getPublic = async (payload) => {
     // Get the filename being requested
 
     const trimmedAssetName = payload.path.replace('public/','').trim();
-    console.log(trimmedAssetName);
     // Getting the static asset
     const asset = await getStaticAsset(trimmedAssetName);
 

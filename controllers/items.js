@@ -17,7 +17,7 @@ const postItem = async ({ payload }) => {
       // get a random string as id for the new item
       const itemId = makeRandomString(16);
 
-      const itemData = {id: itemId, name, price};
+      const itemData = {id: itemId, name, price, bought: 0};
 
       await itemService.create(itemId, itemData);
 
@@ -94,11 +94,15 @@ const updateItem = async ({ payload, queryStringObject }) => {
   const id = (typeof queryStringObject.id === 'string' && typeof payload.id === 'undefined' && queryStringObject.id.length === 16) ? queryStringObject.id : false;
   const price = (typeof payload.price === 'number' && payload.price.length > 0) ? payload.price : false;
   const name = (typeof payload.name === 'string' && payload.name.length > 0) ? payload.name : false;
-  if (id && (price || name)) {
+  const bought = (typeof payload.bought === 'number' && payload.bought > 0) ? payload.bought : false;
+  const image = (typeof payload.image === 'string' && payload.image.length > 0) ? payload.image : false;
+  if (id && (price || name || bought)) {
     try {
       const itemData = await itemService.read(id);
       itemData.price = price || itemData.price;
       itemData.name = name || itemData.name;
+      itemData.bought = bought || itemData.bought;
+      itemData.image = image || itemData.image;
 
       await itemService.update(id, itemData);
 
