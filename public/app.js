@@ -77,6 +77,7 @@ app.client.request = function(headers,path,method,queryStringObject,payload,call
 
   // Send the payload as JSON
   var payloadString = JSON.stringify(payload);
+  console.log(payloadString);
   xhr.send(payloadString);
 
 };
@@ -324,7 +325,7 @@ app.renewToken = function(callback){
   if(currentToken){
     // Update the appToken with a new expiration
     var payload = {
-      'expires' : Date.now() + 1000 * 60 * 60 * 24
+      'expires' : Date.now() + 1000 * 60 * 24
     };
     var queryStringObject = {'id' : currentToken.id};
     app.client.request(undefined,'api/tokens','PUT',queryStringObject,payload,function(statusCode,responsePayload){
@@ -361,8 +362,8 @@ app.loadDataOnPage = function(){
   }
 
   // Logic for check details page
-  if(primaryClass == 'items-edit'){
-    app.loadChecksEditPage();
+  if(primaryClass == 'orders'){
+    app.loadOrdersPage();
   }
 };
 
@@ -394,31 +395,133 @@ app.loadAccountEditPage = function(){
       }
     });
   } else {
-    console.log('loggingUser OUT 4');
     app.logUserOut();
   }
 };
 
 // bind items to order
 app.bindItemClicks = function() {
+  // get all items with class "card"
   const allItems = document.getElementsByClassName("card");
   for (let i = 0; i < allItems.length; i++) {
     const itemId = allItems[i].id;
-    let bought = parseInt(allItems[i].getAttribute('data-bought'));
+    // for each item, we add a click listener
     document.getElementById(itemId).addEventListener('click', function() {
-      app.client.request(undefined,'api/items','PUT',{id: itemId},{bought: bought + 1},function(statusCode,responsePayload) {
-        bought = responsePayload.data.bought;
-        allItems[i].setAttribute("data-bought", responsePayload.data.bought);
-        allItems[i].getElementsByClassName("item-bought")[0].innerText = "Ordered " + responsePayload.data.bought;
+        // call the API to add the item into our cart
+      app.client.request(undefined,'api/cart','POST',{},{itemId},function(statusCode,responsePayload) {
+        // get the element where we gonna show the amount of items on cart
+        const shoppingCart = document.getElementsByClassName("cart-item-count")[0];
+        // if the amount of items on cart is greater than 0, we remove the class inactive, so we can show the badge with the number on it
+        if (shoppingCart.getAttribute('data-count') >= 0){
+          shoppingCart.classList.remove('inactive');
+        }
+        // increment the badge number
+        shoppingCart.setAttribute('data-count', parseInt(shoppingCart.getAttribute('data-count')) + 1);
+        // if the itemId was already on the cart, we only have to increment the quantity of that item and increase the order price
+        // else, we call the template with the items on the user's cart, so we render all the cart items
+        if (!document.querySelector('#cart-item-'+itemId)){
+            const cartList = document.getElementsByClassName('cart-list')[0];
+            app.client.request(undefined,'cart/items','GET',{items: responsePayload.data.cartItems},undefined,function(statusCode,responsePayload,a) {
+                cartList.innerHTML = responsePayload.data.str;
+                // with every item on cart, we attack a remove listener to remove it from the cart
+                app.bindRemoveItem();
+                // bind the button to make the order
+                app.bindPlaceOrderButton();
+            });
+        } else {
+            // we increment the quantity of that item and increase the order price
+            const qty = parseInt(document.querySelector('#cart-item-'+itemId+' .item-qty').innerHTML);
+            document.querySelector('#cart-item-'+itemId+' .item-qty').innerHTML = qty + 1;
+            const itemPrice = parseFloat(document.querySelector('#cart-item-'+itemId).getAttribute('data-price'));
+            let orderPrice = parseFloat(document.querySelector('#place-order span').innerHTML);
+            document.querySelector('#place-order span').innerHTML = orderPrice + itemPrice;
+        }
       });
     })
+  }
+};
+
+// bind cart icon click, to show the items on the cart
+app.bindCartClick = function() {
+
+  const shoppingCart = document.getElementsByClassName("cart")[0];
+  shoppingCart.addEventListener('click', function() {
+      const cartList = document.getElementsByClassName('cart-list')[0];
+      if (cartList.classList.contains('active')) {
+          cartList.classList.remove('active');
+          app.isShoppingCartOpen = false;
+      } else {
+          app.isShoppingCartOpen = true;
+          if (!app.isEventListenerBeenAdded) {
+              window.addEventListener('click', function (e) {
+                  app.isEventListenerBeenAdded = true;
+                  // if we click outside the cart list, we close the cart item window
+                  if (!cartList.contains(e.target) && (!shoppingCart.contains(e.target) || !app.isShoppingCartOpen)) {
+                      cartList.classList.remove('active');
+                      app.isShoppingCartOpen = false;
+                  }
+              });
+          }
+          cartList.classList.add('active');
+      }
+  });
+};
+
+app.bindRemoveItem = function() {
+  const removeItemButtons = document.getElementsByClassName('remove-cart-item');
+  for (let i = 0; i < removeItemButtons.length; i++) {
+      const removeItemButton = removeItemButtons[i];
+      removeItemButton.addEventListener('click', function(){
+        const itemId = removeItemButton.getAttribute('data-item-id');
+        app.client.request(undefined,'api/cart','DELETE',{},{itemId},function(statusCode,responsePayload) {
+            const itemPrice = parseFloat(document.querySelector('#cart-item-'+itemId).getAttribute('data-price'));
+            let orderPrice = parseFloat(document.querySelector('#place-order span').innerHTML);
+            orderPrice -= itemPrice;
+            document.querySelector('#place-order span').innerHTML = orderPrice;
+
+
+            const qty = parseInt(document.querySelector('#cart-item-'+itemId+' .item-qty').innerHTML);
+            if (qty === 1) {
+                document.querySelector('#cart-item-'+itemId).remove();
+            } else {
+                document.querySelector('#cart-item-'+itemId+' .item-qty').innerHTML = qty - 1;
+            }
+            const shoppingCart = document.getElementsByClassName("cart-item-count")[0];
+            shoppingCart.setAttribute('data-count', parseInt(shoppingCart.getAttribute('data-count')) - 1);
+            if (shoppingCart.getAttribute('data-count') === '0') {
+                shoppingCart.classList.add('inactive');
+                document.getElementsByClassName('cart-list')[0].classList.remove('active');
+                app.isShoppingCartOpen = false;
+            }
+
+        });
+      });
 
   }
+};
+
+app.bindPlaceOrderButton = function() {
+  const orderButton = document.getElementById('place-order');
+  orderButton.addEventListener('click', function(){
+    if (!app.orderBeingProcessed) {
+        app.orderBeingProcessed = true;
+        app.client.request(undefined, 'api/orders', 'POST', {}, {}, function (statusCode, responsePayload) {
+            if (statusCode === 200) {
+                document.getElementsByClassName('cart-list')[0].innerHTML = 'Order confirmed';
+                document.getElementsByClassName("cart-item-count")[0].setAttribute('data-count', "0");
+                document.getElementsByClassName("cart-item-count")[0].classList.add('inactive');
+            }
+            app.orderBeingProcessed = false;
+        });
+    }
+  })
 };
 
 // Load the dashboard page specifically
 app.loadItemsAvailablePage = function(){
   app.bindItemClicks();
+  app.bindCartClick();
+
   // Get the email number from the current appToken, or log the user out if none is there
   var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
   if(email){
@@ -429,55 +532,16 @@ app.loadItemsAvailablePage = function(){
     app.client.request(undefined,'api/users','GET',queryStringObject,undefined,function(statusCode,responsePayload){
       if(statusCode == 200){
 
-        app.client.request(undefined,'api/items','GET',undefined,undefined,function(statusCode,itemsPayload){
-          console.log(itemsPayload);
-        });
-
-        // Determine how many checks the user has
-        var allChecks = typeof(responsePayload.checks) == 'object' && responsePayload.checks instanceof Array && responsePayload.checks.length > 0 ? responsePayload.checks : [];
-        if(allChecks.length > 0){
-
-          // Show each created check as a new row in the table
-          allChecks.forEach(function(checkId){
-            // Get the data for the check
-            var newQueryStringObject = {
-              'id' : checkId
-            };
-            app.client.request(undefined,'api/checks','GET',newQueryStringObject,undefined,function(statusCode,responsePayload){
-              if(statusCode == 200){
-                var checkData = responsePayload;
-                // Make the check data into a table row
-                var table = document.getElementById("checksListTable");
-                var tr = table.insertRow(-1);
-                tr.classList.add('checkRow');
-                var td0 = tr.insertCell(0);
-                var td1 = tr.insertCell(1);
-                var td2 = tr.insertCell(2);
-                var td3 = tr.insertCell(3);
-                var td4 = tr.insertCell(4);
-                td0.innerHTML = responsePayload.method.toUpperCase();
-                td1.innerHTML = responsePayload.protocol+'://';
-                td2.innerHTML = responsePayload.url;
-                var state = typeof(responsePayload.state) == 'string' ? responsePayload.state : 'unknown';
-                td3.innerHTML = state;
-                td4.innerHTML = '<a href="/checks/edit?id='+responsePayload.id+'">View / Edit / Delete</a>';
-              } else {
-                console.log("Error trying to load check ID: ",checkId);
-              }
+        if (responsePayload.data.cartItems && responsePayload.data.cartItems.length) {
+            const shoppingCart = document.getElementsByClassName("cart-item-count")[0];
+            shoppingCart.classList.remove('inactive');
+            shoppingCart.setAttribute('data-count', responsePayload.data.cartItems.length.toString());
+            const cartList = document.getElementsByClassName('cart-list')[0];
+            app.client.request(undefined,'cart/items','GET',{items: responsePayload.data.cartItems},undefined,function(statusCode,responsePayload,a) {
+                cartList.innerHTML = responsePayload.data.str;
+                app.bindRemoveItem();
+                app.bindPlaceOrderButton();
             });
-          });
-
-          if(allChecks.length < 5){
-            // Show the createCheck CTA
-            document.getElementById("createCheckCTA").style.display = 'block';
-          }
-
-        } else {
-          // Show 'you have no checks' message
-          // document.getElementById("noChecksMessage").style.display = 'table-row';
-
-          // Show the createCheck CTA
-          // document.getElementById("createCheckCTA").style.display = 'block';
 
         }
       } else {
@@ -492,44 +556,28 @@ app.loadItemsAvailablePage = function(){
 
 
 // Load the checks edit page specifically
-app.loadChecksEditPage = function(){
-  // Get the check id from the query string, if none is found then redirect back to dashboard
-  var id = typeof(window.location.href.split('=')[1]) == 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false;
-  if(id){
-    // Fetch the check data
-    var queryStringObject = {
-      'id' : id
-    };
-    app.client.request(undefined,'api/checks','GET',queryStringObject,undefined,function(statusCode,responsePayload){
-      if(statusCode == 200){
+app.loadOrdersPage = function(){
+    var email = typeof(app.config.sessionToken.userEmail) == 'string' ? app.config.sessionToken.userEmail : false;
+    if(email) {
+        // Fetch the user data
+        var queryStringObject = {
+            'email': email
+        };
+        app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined, function (statusCode, responsePayload) {
+            if (statusCode === 200) {
+                app.client.request(undefined,'order/items','GET',{orders: responsePayload.data.orders.join(',')},undefined,function(statusCode,responsePayload) {
+                    const orderList = document.getElementsByClassName('order-list')[0];
+                    orderList.innerHTML = responsePayload.data.str;
+                });
+            } else {
+                // If the request comes back as something other than 200, redirect back to dashboard
+                window.location = '/items/available';
+            }
+        });
+    } else {
+      app.logUserOut();
+    }
 
-        // Put the hidden id field into both forms
-        var hiddenIdInputs = document.querySelectorAll("input.hiddenIdInput");
-        for(var i = 0; i < hiddenIdInputs.length; i++){
-          hiddenIdInputs[i].value = responsePayload.id;
-        }
-
-        // Put the data into the top form as values where needed
-        document.querySelector("#checksEdit1 .displayIdInput").value = responsePayload.id;
-        document.querySelector("#checksEdit1 .displayStateInput").value = responsePayload.state;
-        document.querySelector("#checksEdit1 .protocolInput").value = responsePayload.protocol;
-        document.querySelector("#checksEdit1 .urlInput").value = responsePayload.url;
-        document.querySelector("#checksEdit1 .methodInput").value = responsePayload.method;
-        document.querySelector("#checksEdit1 .timeoutInput").value = responsePayload.timeoutSeconds;
-        var successCodeCheckboxes = document.querySelectorAll("#checksEdit1 input.successCodesInput");
-        for(var i = 0; i < successCodeCheckboxes.length; i++){
-          if(responsePayload.successCodes.indexOf(parseInt(successCodeCheckboxes[i].value)) > -1){
-            successCodeCheckboxes[i].checked = true;
-          }
-        }
-      } else {
-        // If the request comes back as something other than 200, redirect back to dashboard
-        window.location = '/items/available';
-      }
-    });
-  } else {
-    window.location = '/items/available';
-  }
 };
 
 // Loop to renew appToken often
@@ -540,7 +588,7 @@ app.appTokenRenewalLoop = function(){
         console.log("Token renewed successfully @ "+Date.now());
       }
     });
-  },1000 * 10);
+  }, 1000 * 60 * 2);
 };
 
 // Init (bootstrapping)
@@ -560,6 +608,10 @@ app.init = function(){
 
   // Load data on page
   app.loadDataOnPage();
+
+  app.isShoppingCartOpen = false;
+  app.isEventListenerBeenAdded = false;
+  app.orderBeingProcessed = false;
 
 };
 

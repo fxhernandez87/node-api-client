@@ -77,7 +77,31 @@ body.loggedIn .header ul li.loggedOut{
 
 .header .logo img{
     width: 200px;
+}
 
+
+*.icon-blue {color: #0088cc}
+*.icon-grey {color: grey}
+.header .menu i {
+    width:50px;
+    text-align:center;
+    vertical-align:middle;
+    position: relative;
+}
+.badge:not(.inactive):after{
+    content:attr(data-count);
+    position: absolute;
+    background: rgba(0,0,255,1);
+    height:1rem;
+    top:1rem;
+    right:0;
+    width:1rem;
+    text-align: center;
+    line-height: 1rem;;
+    font-size: .75rem;
+    border-radius: 50%;
+    color:white;
+    border:1px solid blue;
 }
 
 .content {
@@ -341,7 +365,7 @@ td a, td a:hover, td a:active{
     transition: -webkit-box-shadow .1s ease,-webkit-transform .1s ease;
     transition: box-shadow .1s ease,transform .1s ease;
     transition: box-shadow .1s ease,transform .1s ease,-webkit-box-shadow .1s ease,-webkit-transform .1s ease;
-    z-index: '';
+    z-index: 1;
 }
 
 .ui.card>.image, .ui.cards>.card>.image {
@@ -465,14 +489,21 @@ td a, td a:hover, td a:active{
 }
 
 .ui.link.cards .card:before {
-    content: "";
+    content: "Buy Me";
     position: absolute;
     z-index: 10;
+    font-size: 5em;
+    text-align: center;
     width: 100%;
+    vertical-align: middle;
+    padding-top: 2em;
+    color: white;
     height: 80%;
     top: 100%;
     background-color: black;
+    border: white 1px solid;
     opacity: 0.6;
+    border-radius: 9%;
     transition: all 0.5s ease;
 }
 
@@ -524,4 +555,199 @@ i.icon {
     -webkit-font-smoothing: antialiased;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+}
+
+.ui.list:first-child, ol.ui.list:first-child, ul.ui.list:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.ui.list {
+    font-size: 1em;
+}
+
+.ui.list.cart-list {
+    width: 350px;
+    position: absolute;
+    display: none;
+    top: 9em;
+    right: 18em;
+    z-index: 49;
+    background: snow;
+    padding: 2em;
+    border-radius: .28571429rem;
+    box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+}
+
+.ui.list.cart-list.active {
+    display: block;
+    transition: all .1s ease;
+}
+
+
+.ui.list, ol.ui.list, ul.ui.list {
+    list-style-type: none;
+    margin: 1em 0;
+    padding: 0 0;
+}
+
+.ui.divided.list .list>.item:first-child, .ui.divided.list>.item:first-child {
+    border-top: none;
+}
+
+.ui.divided.list>.item {
+    border-top: 1px solid rgba(34,36,38,.15);
+}
+
+.ui.list .list>.item:first-child, .ui.list>.item:first-child, ol.ui.list li:first-child, ul.ui.list li:first-child {
+    padding-top: 0;
+}
+
+.ui.list .list>.item, .ui.list>.item, ol.ui.list li, ul.ui.list li {
+    display: list-item;
+    table-layout: fixed;
+    list-style-type: none;
+    list-style-position: outside;
+    padding: .21428571em 0;
+    line-height: 4.14285714em;
+}
+
+.ui.list [class*="middle aligned"], .ui.list[class*="middle aligned"] .content2, .ui.list[class*="middle aligned"] .image {
+    vertical-align: middle!important;
+}
+
+.ui.list .list>.item [class*="right floated"], .ui.list>.item [class*="right floated"] {
+    float: right;
+    margin: 0 0 0 1em;
+}
+
+.ui.list .list>.item>.content2, .ui.list>.item>.content2 {
+    line-height: 1.14285714em;
+}
+
+.ui.button, .ui.buttons .button, .ui.buttons .or {
+    font-size: 1rem;
+}
+
+.ui.button {
+    cursor: pointer;
+    display: inline-block;
+    min-height: 1em;
+    outline: 0;
+    border: none;
+    vertical-align: baseline;
+    background: #e0e1e2 none;
+    color: rgba(0,0,0,.6);
+    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+    margin: 0 .25em 0 0;
+    padding: .78571429em 1.5em .78571429em;
+    text-transform: none;
+    text-shadow: none;
+    font-weight: 700;
+    line-height: 1em;
+    font-style: normal;
+    text-align: center;
+    text-decoration: none;
+    border-radius: .28571429rem;
+    -webkit-box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+    box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: opacity .1s ease,background-color .1s ease,color .1s ease,background .1s ease,-webkit-box-shadow .1s ease;
+    transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ui.button:hover {
+    background-color: #cacbcd;
+    background-image: none;
+    -webkit-box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+    box-shadow: 0 0 0 1px transparent inset, 0 0 0 0 rgba(34,36,38,.15) inset;
+    color: rgba(0,0,0,.8);
+}
+
+.ui.list .list>.item>.image:only-child, .ui.list .list>.item>img.image, .ui.list>.item>.image:only-child, .ui.list>.item>img.image {
+    display: inline-block;
+}
+
+.ui.list [class*="middle aligned"], .ui.list[class*="middle aligned"] .content2, .ui.list[class*="middle aligned"] .image {
+    vertical-align: middle!important;
+}
+.ui.list .list>.item>.image, .ui.list>.item>.image {
+    display: table-cell;
+    background-color: transparent;
+    margin: 0;
+    vertical-align: top;
+}
+
+.ui.avatar.image, .ui.avatar.image img, .ui.avatar.image svg, .ui.avatar.images .image, .ui.avatar.images img, .ui.avatar.images svg {
+    margin-right: .25em;
+    display: inline-block;
+    width: 2em;
+    height: 2em;
+    border-radius: 500rem;
+}
+img.ui.image {
+    display: block;
+}
+.ui.image {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+    background-color: transparent;
+}
+
+img {
+    border-style: none;
+}
+
+.ui.list .list>.item>img.image+.content2, .ui.list>.item>img.image+.content2 {
+    display: inline-block;
+    width: auto;
+}
+
+.ui.list .list>.item>.icon+.content2, .ui.list .list>.item>.image+.content2, .ui.list>.item>.icon+.content2, .ui.list>.item>.image+.content2 {
+    display: table-cell;
+    width: 100%;
+    padding: 0 0 0 .5em;
+    vertical-align: top;
+}
+.ui.list [class*="middle aligned"], .ui.list[class*="middle aligned"] .content2, .ui.list[class*="middle aligned"] .image {
+    vertical-align: middle!important;
+}
+.ui.list .list>.item>.content2, .ui.list>.item>.content2 {
+    line-height: 1.14285714em;
+}
+
+.cart-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#place-order {
+    background-color: #c83737;
+    color: #efefef;
+    text-align: center;
+    width: 200px;
+}
+.order-list .item {
+    border-top: none !important;
+}
+.order-item-content {
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px 0 #bcbdbd, 0 0 0 1px #d4d4d5;
+    padding: 1em;
+    border: none;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.o-items {
+    width: 30%;
+    height: 3em;
 }

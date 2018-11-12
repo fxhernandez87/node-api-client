@@ -11,13 +11,14 @@ const userService = dataService('users');
  */
 const postItem = async ({ payload }) => {
   const name = (typeof payload.name === 'string' && payload.name.length > 0) ? payload.name : false;
+  const image = (typeof payload.image === 'string' && payload.image.length > 0) ? payload.image : '';
   const price = (typeof payload.price === 'number' && payload.price > 0) ? payload.price : false;
   if (name && price) {
     try {
       // get a random string as id for the new item
       const itemId = makeRandomString(16);
 
-      const itemData = {id: itemId, name, price, bought: 0};
+      const itemData = {id: itemId, name, price, bought: 0, image};
 
       await itemService.create(itemId, itemData);
 
@@ -92,11 +93,11 @@ const getItem = async ({ queryStringObject }) => {
 
 const updateItem = async ({ payload, queryStringObject }) => {
   const id = (typeof queryStringObject.id === 'string' && typeof payload.id === 'undefined' && queryStringObject.id.length === 16) ? queryStringObject.id : false;
-  const price = (typeof payload.price === 'number' && payload.price.length > 0) ? payload.price : false;
+  const price = (typeof payload.price === 'number' && payload.price > 0) ? payload.price : false;
   const name = (typeof payload.name === 'string' && payload.name.length > 0) ? payload.name : false;
   const bought = (typeof payload.bought === 'number' && payload.bought > 0) ? payload.bought : false;
   const image = (typeof payload.image === 'string' && payload.image.length > 0) ? payload.image : false;
-  if (id && (price || name || bought)) {
+  if (id && (price || name || bought || image)) {
     try {
       const itemData = await itemService.read(id);
       itemData.price = price || itemData.price;

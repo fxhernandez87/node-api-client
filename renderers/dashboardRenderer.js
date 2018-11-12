@@ -4,14 +4,13 @@ const dataService = require('../services/data');
 // instantiating service
 const itemService = dataService('items');
 
-
 const getIndex = async (data) => {
   // Prepare data for interpolation
   const templateData = {
     'head.title' : 'Delivery Application',
     'head.description' : 'Orders and payments made easy',
     'body.class': data.path.replace('/', '-'),
-    'body.items': ''
+    'body.items': '',
   };
   try {
     const items = await itemService.list();
@@ -25,7 +24,6 @@ const getIndex = async (data) => {
 
       const itemsRender = await Promise.all(
         itemsData.map(async ({id, name, description, price, image, bought}) => {
-          console.log(bought);
           const itemRender = {
             'item.id': id,
             'item.name': name,
@@ -34,7 +32,6 @@ const getIndex = async (data) => {
             'item.image': image || 'public/images/empty.jpg',
             'item.bought': parseInt(bought) || 0
           };
-          console.log(itemRender);
           // Read in item template as a string
           return getTemplate('item', itemRender);
         })

@@ -1,6 +1,8 @@
 // Dependencies
 const { formatResponse, getTemplate, addUniversalTemplates } = require('../lib/helpers');
-
+const dataService = require('../services/data');
+// instantiating service
+const itemService = dataService('items');
 
 const getIndex = async () => {
   // Prepare data for interpolation
