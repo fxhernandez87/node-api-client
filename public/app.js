@@ -565,10 +565,12 @@ app.loadOrdersPage = function(){
         };
         app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined, function (statusCode, responsePayload) {
             if (statusCode === 200) {
-                app.client.request(undefined,'order/items','GET',{orders: responsePayload.data.orders.join(',')},undefined,function(statusCode,responsePayload) {
-                    const orderList = document.getElementsByClassName('order-list')[0];
-                    orderList.innerHTML = responsePayload.data.str;
-                });
+                if (responsePayload.data.orders && responsePayload.data.orders.length) {
+                    app.client.request(undefined, 'order/items', 'GET', {orders: responsePayload.data.orders.join(',')}, undefined, function (statusCode, responsePayload) {
+                        const orderList = document.getElementsByClassName('order-list')[0];
+                        orderList.innerHTML = responsePayload.data.str;
+                    });
+                }
             } else {
                 // If the request comes back as something other than 200, redirect back to dashboard
                 window.location = '/items/available';
