@@ -1,3 +1,5 @@
+# Delivery Site
+You dont have to do anything, just node index.js
 # Delivery API
 
 ## Paths
@@ -15,7 +17,7 @@
 - **[<code>PUT</code> ](#userput)** /users
 - **[<code>DELETE</code> ](#userdelete)** /users
 
-#### User/GET      
+#### User/GET
 ##### Path:
     /users
 ##### Parameters:
@@ -23,7 +25,7 @@
 ##### Headers:
     tokenid* (Required)
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'User fecthed Correctly',
         data: {
@@ -41,7 +43,7 @@
     404: User not Found
     500: Insufficient Permissions
 
-#### User/POST      
+#### User/POST
 ##### Path:
     /users
 ##### Parameters:
@@ -52,7 +54,7 @@
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'User created',
         data: {
@@ -63,20 +65,20 @@
     }
 ##### Errors
     400: User already exists
-    400: Required fields missing or they were invalid    
+    400: Required fields missing or they were invalid
     500: Insufficient Permissions
-    
-#### User/PUT      
+
+#### User/PUT
 ##### Path:
     /users?email=example@mail.com
-##### Parameters:    
+##### Parameters:
     password
     name
     address
 ##### Headers:
     tokenid* (Required)
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'User updated correctly',
         data: {
@@ -90,19 +92,19 @@
     400: Nothing to update
     400: Email in query is required
     403: Unauthorized access
-    404: User not found    
+    404: User not found
     421: Email cannot be updated
-    500: Insufficient Permissions    
-    
-#### User/DELETE      
+    500: Insufficient Permissions
+
+#### User/DELETE
 ##### Path:
     /users?email=example@mail.com
 ##### Parameters:
-    none    
+    none
 ##### Headers:
     tokenid* (Required)
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'user removed correctly',
         data: {}
@@ -110,7 +112,7 @@
 ##### Errors
     400: Required fields missing or they were invalid
     403: Unauthorized access
-    404: User not found    
+    404: User not found
     500: Insufficient Permissions
 
 ### Tokens
@@ -120,7 +122,7 @@
 - **[<code>PUT</code> ](#tokenput)** /tokens
 - **[<code>DELETE</code> ](#tokendelete)** /tokens
 
-#### Token/GET      
+#### Token/GET
 ##### Path:
     /tokens?id=string
 ##### Parameters:
@@ -128,7 +130,7 @@
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Token fecthed Correctly',
         data: {
@@ -143,7 +145,7 @@
     404: Token not Found
     500: Insufficient Permissions
 
-#### Token/POST      
+#### Token/POST
 ##### Path:
     /tokens
 ##### Parameters:
@@ -152,7 +154,7 @@
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'user logged in',
         data: {
@@ -165,18 +167,18 @@
     400: Required fields missing or they were invalid
     400: wrong email or password
     400: Token already exists
-    404: User does not exists    
+    404: User does not exists
     500: Insufficient Permissions
-    
-#### Token/PUT      
+
+#### Token/PUT
 ##### Path:
     /tokens?id=string
-##### Parameters:    
+##### Parameters:
     expires
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Token updated correctly',
         data: {
@@ -189,19 +191,19 @@
     400: Nothing to update
     400: id in query is required
     403: Unauthorized access
-    404: Token not found    
+    404: Token not found
     421: id cannot be updated
-    500: Insufficient Permissions    
-    
-#### Token/DELETE      
+    500: Insufficient Permissions
+
+#### Token/DELETE
 ##### Path:
     /tokens?id=string
 ##### Parameters:
-    none    
+    none
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'token removed correctly',
         data: {}
@@ -209,7 +211,7 @@
 ##### Errors
     400: Required fields missing or they were invalid
     403: Unauthorized access
-    404: Token not found    
+    404: Token not found
     500: Insufficient Permissions
 
 ### Items
@@ -219,7 +221,7 @@
 - **[<code>PUT</code> ](#itemput)** /items
 - **[<code>DELETE</code> ](#itemdelete)** /items
 
-#### Item/GET      
+#### Item/GET
 ##### Path:
     /items?id=string
 ##### Parameters:
@@ -227,7 +229,7 @@
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Item fecthed Correctly',
         data: {
@@ -242,7 +244,7 @@
     404: Item not Found
     500: Insufficient Permissions
 
-#### Item/POST      
+#### Item/POST
 ##### Path:
     /items
 ##### Parameters:
@@ -251,7 +253,7 @@
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Item created',
         data: {
@@ -261,19 +263,19 @@
         }
     }
 ##### Errors
-    400: Required fields missing or they were invalid    
+    400: Required fields missing or they were invalid
     500: Insufficient Permissions
-    
-#### Item/PUT      
+
+#### Item/PUT
 ##### Path:
     /items?id=string
-##### Parameters:    
+##### Parameters:
     name* required
     price* required
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Item updated correctly',
         data: {
@@ -287,20 +289,20 @@
     400: Nothing to update
     400: id in query is required
     403: Unauthorized access
-    404: Item not found    
+    404: Item not found
     421: id cannot be updated
-    500: Insufficient Permissions    
-    
+    500: Insufficient Permissions
+
 #### Item/DELETE
-    Will remove the item and update all users cartItems that had this item and remove it      
+    Will remove the item and update all users cartItems that had this item and remove it
 ##### Path:
     /items?id=string
 ##### Parameters:
-    none    
+    none
 ##### Headers:
     none
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'item removed correctly',
         data: {}
@@ -308,24 +310,24 @@
 ##### Errors
     400: Required fields missing or they were invalid
     403: Unauthorized access
-    404: Item not found    
+    404: Item not found
     500: Insufficient Permissions
-    
+
 ### Cart
 #### Methods
 - **[<code>GET</code> ](#cartget)** /cart
 - **[<code>POST</code> ](#cartpost)** /cart
 - **[<code>DELETE</code> ](#cartdelete)** /cart
 
-#### Cart/GET      
+#### Cart/GET
 ##### Path:
     /cart
 ##### Parameters:
-    none    
+    none
 ##### Headers:
     tokenid* Required
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Cart fecthed Correctly',
         data: {
@@ -339,7 +341,7 @@
     404: items not Found
     500: Insufficient Permissions
 
-#### Cart/POST      
+#### Cart/POST
 ##### Path:
     /cart
 ##### Parameters:
@@ -347,7 +349,7 @@
 ##### Headers:
     tokenid* Required
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'item added to cart',
         data: {
@@ -360,9 +362,9 @@
         }
     }
 ##### Errors
-    400: Required fields missing or they were invalid    
+    400: Required fields missing or they were invalid
     500: Insufficient Permissions
-    
+
 #### Cart/DELETE
 ##### Path:
     /cart
@@ -371,7 +373,7 @@
 ##### Headers:
     tokenid* Required
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'item removed from cart',
         data: {
@@ -386,25 +388,25 @@
 ##### Errors
     400: Required fields missing or they were invalid
     403: Unauthorized access
-    404: item not found on cart    
-    404: User not found    
+    404: item not found on cart
+    404: User not found
     500: Insufficient Permissions
 
-    
+
 ### Orders
 #### Methods
 - **[<code>GET</code> ](#orderget)** /orders
 - **[<code>POST</code> ](#orderpost)** /orders
 
-#### Order/GET      
+#### Order/GET
 ##### Path:
     /orders
 ##### Parameters:
-    id* Required    
+    id* Required
 ##### Headers:
     tokenid* Required
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'Order fecthed Correctly',
         data: {
@@ -421,8 +423,8 @@
     404: Order not found
     500: Insufficient Permissions
 
-#### Order/POST    
-    Will create the order with the items on the cart  
+#### Order/POST
+    Will create the order with the items on the cart
 ##### Path:
     /orders
 ##### Parameters:
@@ -430,7 +432,7 @@
 ##### Headers:
     tokenid* Required
 ##### Response
-    {   
+    {
         statusCode: 200,
         message: 'order created',
         data: {
@@ -442,8 +444,8 @@
         }
     }
 ##### Errors
-    400: payment not processed   
+    400: payment not processed
     400: no items on cart to place an order
     400: Order already exists
-    400: Required fields missing or they were invalid    
+    400: Required fields missing or they were invalid
     500: Insufficient Permissions
