@@ -81,7 +81,6 @@ const updateToken = async ({ payload, queryStringObject }) => {
     try {
       const tokenData = await tokenService.read(id);
       tokenData.expires = expires || tokenData.expires;
-      tokenData.userEmail = userEmail || tokenData.userEmail;
 
       await tokenService.update(id, tokenData);
 

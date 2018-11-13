@@ -23,7 +23,7 @@ const postUser = async ({ payload }) => {
       await userService.create(email, userData);
       delete userData.password;
 
-      return formatResponse(200, 'user created', userData);
+      return formatResponse(200, 'User created', userData);
     } catch (err) {
       switch (err.code) {
         case 'EEXIST':
@@ -94,7 +94,7 @@ const updateUser = async ({ payload, queryStringObject, headers }) => {
       await userService.update(email, userData);
       delete userData.password;
 
-      return formatResponse(200, 'user updated correctly', userData);
+      return formatResponse(200, 'User updated correctly', userData);
     } catch (err) {
       switch (err.code) {
         case 'ENOENT':

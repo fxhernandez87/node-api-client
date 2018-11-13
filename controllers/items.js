@@ -138,7 +138,7 @@ const deleteItem = async ({ queryStringObject }) => {
 
       // find all users that have that item on their cart
       const userList = await userService.list();
-      const userDataList = await Promise.all(userList.map(email => userService.read(email)));
+      const userDataList = await Promise.all(userList.map(email => userService.read(email+'.com')));
 
       //filter all users that have that item
       const userWithThisItem = userDataList.filter(user => user.cartItems.find(itemId => itemId === id));
